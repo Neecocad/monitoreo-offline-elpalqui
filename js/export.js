@@ -28,5 +28,5 @@ export async function exportParcelasCSV(schema){
   const headers=schema.csv.columns.map(c=>c.label);
   const csv=toCSV(rows,headers);
   const stamp=new Date().toISOString().slice(0,19).replace(/[:T]/g,"-");
-  downloadText(`${schema.csv.filename_prefix}_${stamp}.csv`,csv,"text/csv;charset=utf-8");
+  downloadText(`${schema.csv.filename_prefix}_${stamp}.csv`,"\ufeff"+csv,"text/csv;charset=utf-8");
 }
