@@ -1,0 +1,9 @@
+{
+"parcelas": {
+"species": [
+{ "code": "quillay", "label": "Quillay" },
+{ "code": "espino", "label": "Espino" },
+{ "code": "litre", "label": "Litre" }
+]
+}
+}
