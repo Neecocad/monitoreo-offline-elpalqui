@@ -1,5 +1,5 @@
 import { uuid, isoNow, todayISO, showToast } from "./utils.js";
-import { put, getAllLast, metaGet, metaSet } from "./db.js";
+import { put, getAllLast, clearAll, metaGet, metaSet } from "./db.js";
 import { loadSchemas, renderHeader, renderIndividual, validateParcel } from "./schema_engine.js";
 import { loadChoices } from "./catalogs.js";
 import { exportParcelasCSV } from "./export.js";
@@ -147,6 +147,19 @@ async function main(){
   document.getElementById("btnSaveParcel").onclick=saveParcel;
   document.getElementById("btnNewParcel").onclick=()=>{ newParcel(); showToast("Nueva parcela."); };
   document.getElementById("btnExportParcelas").onclick=()=>exportParcelasCSV(schema);
+  const btnClear = document.getElementById("btnClearAll");
+
+  if (btnClear) {
+    btnClear.onclick = async () => {
+      const ok = confirm("¿Estás seguro que quieres borrar TODOS los registros guardados?");
+      if (!ok) return;
+
+      await clearAll(schema.store);
+
+      alert("Registros eliminados correctamente.");
+      location.reload();
+    };
+  }
 
   newParcel();
   await setupSW();
