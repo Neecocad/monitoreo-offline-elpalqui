@@ -1,47 +1,18 @@
 {
   "parcelas": {
     "species": [
-      {
-        "code": "colliguay",
-        "label": "Colliguay"
-      },
-      {
-        "code": "espino",
-        "label": "Espino"
-      },
-      {
-        "code": "huingan",
-        "label": "Huingán"
-      },
-      {
-        "code": "litre",
-        "label": "Litre"
-      },
-      {
-        "code": "molle",
-        "label": "Molle"
-      },
-      {
-        "code": "peumo",
-        "label": "Peumo"
-      },
-      {
-        "code": "quillay",
-        "label": "Quillay"
-      },
-      {
-        "code": "quebracho",
-        "label": "Quebracho"
-      },
-      {
-        "code": "maqui",
-        "label": "Maqui"
-      },
-      {
-        "code": "maiten",
-        "label": "Maitén"
-      }
-    ],
+  { "code": "colliguay", "label": "Colliguay" },
+  { "code": "espino", "label": "Espino" },
+  { "code": "huingan", "label": "Huingán" },
+  { "code": "litre", "label": "Litre" },
+  { "code": "molle", "label": "Molle" },
+  { "code": "peumo", "label": "Peumo" },
+  { "code": "quillay", "label": "Quillay" },
+  { "code": "quebracho", "label": "Quebracho" },
+  { "code": "maqui", "label": "Maqui" },
+  { "code": "maiten", "label": "Maitén" }
+],
+   
     "sobrevivencia": [
       {
         "code": "0",
