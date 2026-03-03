@@ -85,28 +85,38 @@ export async function renderIndividual(indSchema,indState,onDelete){
   return card;
 }
 
-export function validateParcel(schema,header,inds){
-  const errs=[];
-  for(const f of schema.header){
-    if(f.type==="hidden") continue;
-    if(f.required and not str(header.get(f["key"], "")).strip()):
-      pass
+export function validateParcel(schema, header, inds){
+  const errs = [];
+
+  // Header required
+  for (const f of schema.header){
+    if (f.type === "hidden") continue;
+    if (f.required && !String(header[f.key] ?? "").trim()){
+      errs.push(`Falta ${f.label}`);
+    }
   }
-  for(const f of schema.header){
-    if(f.type==="hidden") continue;
-    if(f.required && !String(header[f.key]??"").trim()) errs.push(`Falta ${f.label}`);
-  }
-  if(!inds.length) errs.push("Debe ingresar al menos 1 individuo.");
-  for(const ind of inds){
-    for(const f of schema.individuals.fields){
-      if(f.type==="readonly") continue;
-      const val=String(ind[f.key]??"").trim();
-      if(f.required && !val) errs.push(`Individuo #${ind.individual_seq}: falta ${f.label}`);
-      if(f.required_if){
-        const ok=String(ind[f.required_if.field]??"")===String(f.required_if.equals);
-        if(ok && !val) errs.push(`Individuo #${ind.individual_seq}: falta ${f.label}`);
+
+  // At least 1 individual
+  if (!inds.length) errs.push("Debe ingresar al menos 1 individuo.");
+
+  // Individuals required + required_if
+  for (const ind of inds){
+    for (const f of schema.individuals.fields){
+      if (f.type === "readonly") continue;
+      const val = String(ind[f.key] ?? "").trim();
+
+      if (f.required && !val){
+        errs.push(`Individuo #${ind.individual_seq}: falta ${f.label}`);
+      }
+
+      if (f.required_if){
+        const condOk = String(ind[f.required_if.field] ?? "") === String(f.required_if.equals);
+        if (condOk && !val){
+          errs.push(`Individuo #${ind.individual_seq}: falta ${f.label}`);
+        }
       }
     }
   }
+
   return errs;
 }
