@@ -139,7 +139,11 @@ async function main(){
   const schemas=await loadSchemas();
   schema=schemas["parcelas_veg"];
 
-  document.getElementById("btnAddIndBottom").onclick=addIndividual;
+  const btnTop = document.getElementById("btnAddInd");
+  if (btnTop) btnTop.onclick = addIndividual;
+
+  const btnBottom = document.getElementById("btnAddIndBottom");
+  if (btnBottom) btnBottom.onclick = addIndividual;
   document.getElementById("btnSaveParcel").onclick=saveParcel;
   document.getElementById("btnNewParcel").onclick=()=>{ newParcel(); showToast("Nueva parcela."); };
   document.getElementById("btnExportParcelas").onclick=()=>exportParcelasCSV(schema);
