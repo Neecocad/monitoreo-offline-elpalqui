@@ -147,10 +147,14 @@ async function main(){
   document.getElementById("btnSaveParcel").onclick=saveParcel;
   document.getElementById("btnNewParcel").onclick=()=>{ newParcel(); showToast("Nueva parcela."); };
   document.getElementById("btnExportParcelas").onclick=()=>exportParcelasCSV(schema);
-  const btnClear = document.getElementById("btnClearAll");
+  
+  document.addEventListener("click", async (e) => {
+    const t = e.target;
+    if (!t) return;
 
-  if (btnClear) {
-    btnClear.onclick = async () => {
+    if (t.id === "btnClearAll") {
+      e.preventDefault();
+
       const ok = confirm("¿Estás seguro que quieres borrar TODOS los registros guardados?");
       if (!ok) return;
 
@@ -158,8 +162,8 @@ async function main(){
 
       alert("Registros eliminados correctamente.");
       location.reload();
-    };
-  }
+    }
+  });
 
   newParcel();
   await setupSW();
