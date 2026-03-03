@@ -1,15 +1,61 @@
 <!doctype html>
 <html lang="es">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Monitoreo Offline - Eletrans Palqui</title>
-<link rel="manifest" href="manifest.webmanifest">
-<link rel="stylesheet" href="assets/css/app.css">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#0b0f14" />
+  <title>Monitoreo Offline - Eletrans Palqui</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="stylesheet" href="assets/css/app.css">
 </head>
 <body>
-<h1>Parcelas - Eletrans Palqui</h1>
-<p>Proyecto listo para extender.</p>
+<header>
+  <div>
+    <h1>Monitoreo Offline · Eletrans Palqui</h1>
+    <div class="small">PWA · IndexedDB · Export CSV</div>
+  </div>
+  <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+    <span id="netBadge" class="badge">…</span>
+    <span id="swBadge" class="badge">SW: …</span>
+    <span id="verBadge" class="badge">v…</span>
+    <button id="btnUpdate" style="display:none;">Aplicar actualización</button>
+  </div>
+</header>
+
+<main>
+  <section class="card">
+    <h2>Parcelas de monitoreo de vegetación</h2>
+    <div class="small">Cada fila del CSV = 1 individuo. Incluye Rodal en el encabezado.</div>
+
+    <div class="hr"></div>
+    <h2>Encabezado</h2>
+    <div class="grid" id="headerFields"></div>
+
+    <div class="hr"></div>
+    <div class="ind-head">
+      <div>
+        <div style="font-weight:700;">Individuos</div>
+        <div class="small">Si Sobrevivencia = Muerto, se bloquean parámetros de individuos vivos.</div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button id="btnAddInd" class="primary" type="button">+ Agregar individuo</button>
+        <button id="btnSaveParcel" class="primary" type="button">Guardar parcela</button>
+        <button id="btnNewParcel" type="button">Nueva parcela</button>
+        <button id="btnExportParcelas" type="button">Exportar CSV</button>
+      </div>
+    </div>
+
+    <div id="indList" class="ind-list"></div>
+    <div class="small" id="indCount"></div>
+
+    <div class="hr"></div>
+    <h2>Registros guardados</h2>
+    <div class="small" id="savedList"></div>
+  </section>
+
+  <div id="toast" class="toast"></div>
+</main>
+
 <script type="module" src="js/app.js"></script>
 </body>
 </html>

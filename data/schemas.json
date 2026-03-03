@@ -1,6 +1,244 @@
 {
-"parcelas_veg": {
-"title": "Parcelas",
-"store": "parcelas_veg"
-}
+  "parcelas_veg": {
+    "title": "Parcelas de monitoreo de vegetación",
+    "store": "parcelas_veg",
+    "header": [
+      {
+        "key": "date",
+        "label": "Fecha",
+        "type": "date",
+        "required": true,
+        "default": "today"
+      },
+      {
+        "key": "project",
+        "label": "Proyecto",
+        "type": "text",
+        "required": true,
+        "default": "Eletrans Palqui"
+      },
+      {
+        "key": "rodal",
+        "label": "Rodal",
+        "type": "text",
+        "required": true
+      },
+      {
+        "key": "plot_code",
+        "label": "Código_Parcela",
+        "type": "text",
+        "required": true
+      },
+      {
+        "key": "observer",
+        "label": "Observador",
+        "type": "text",
+        "required": true
+      },
+      {
+        "key": "utm_e",
+        "label": "UTM Este (E)",
+        "type": "number",
+        "required": true
+      },
+      {
+        "key": "utm_n",
+        "label": "UTM Norte (N)",
+        "type": "number",
+        "required": true
+      },
+      {
+        "key": "utm_zone",
+        "label": "UTM Zona",
+        "type": "hidden",
+        "default": "19S"
+      },
+      {
+        "key": "datum",
+        "label": "Datum",
+        "type": "hidden",
+        "default": "WGS84"
+      }
+    ],
+    "individuals": {
+      "fields": [
+        {
+          "key": "individual_seq",
+          "label": "N° individuo",
+          "type": "readonly"
+        },
+        {
+          "key": "species",
+          "label": "Especie",
+          "type": "select",
+          "choices": "parcelas.species",
+          "required": true
+        },
+        {
+          "key": "sobrevivencia",
+          "label": "1.-Sobrevivencia",
+          "type": "select",
+          "choices": "parcelas.sobrevivencia",
+          "required": true
+        },
+        {
+          "key": "afectacion_por_incendio_en_individuos_vivos",
+          "label": "2.- Afectación por incendio (en individuos vivos)",
+          "type": "select",
+          "choices": "parcelas.afectacion_por_incendio_en_individuos_vivos",
+          "required_if": {
+            "field": "sobrevivencia",
+            "equals": "1"
+          }
+        },
+        {
+          "key": "respuesta_post_incendio_en_vivos",
+          "label": "3.- Respuesta post-incendio (en vivos)",
+          "type": "select",
+          "choices": "parcelas.respuesta_post_incendio_en_vivos",
+          "required_if": {
+            "field": "sobrevivencia",
+            "equals": "1"
+          }
+        },
+        {
+          "key": "altura_del_rebrote",
+          "label": "4.- Altura del rebrote",
+          "type": "select",
+          "choices": "parcelas.altura_del_rebrote",
+          "required_if": {
+            "field": "sobrevivencia",
+            "equals": "1"
+          }
+        },
+        {
+          "key": "dano_adicional_no_atribuible_al_incendio",
+          "label": "5.- Daño adicional no atribuible al incendio",
+          "type": "select",
+          "choices": "parcelas.dano_adicional_no_atribuible_al_incendio",
+          "required_if": {
+            "field": "sobrevivencia",
+            "equals": "1"
+          }
+        },
+        {
+          "key": "estado_del_tutor_coligue",
+          "label": "6.- Estado del tutor - coligue",
+          "type": "select",
+          "choices": "parcelas.estado_del_tutor_coligue",
+          "required": true
+        },
+        {
+          "key": "estado_del_protector",
+          "label": "7.- Estado del protector",
+          "type": "select",
+          "choices": "parcelas.estado_del_protector",
+          "required": true
+        },
+        {
+          "key": "estado_de_la_taza_de_recepcion_de_aguas",
+          "label": "8.- Estado de la taza de recepción de aguas",
+          "type": "select",
+          "choices": "parcelas.estado_de_la_taza_de_recepcion_de_aguas",
+          "required": true
+        },
+        {
+          "key": "estado_del_bordo_semicircular",
+          "label": "9.- Estado del bordo semicircular",
+          "type": "select",
+          "choices": "parcelas.estado_del_bordo_semicircular",
+          "required": true
+        }
+      ],
+      "rules": [
+        {
+          "if": {
+            "field": "sobrevivencia",
+            "equals": "0"
+          },
+          "disable": [
+            "afectacion_por_incendio_en_individuos_vivos",
+            "respuesta_post_incendio_en_vivos",
+            "altura_del_rebrote",
+            "dano_adicional_no_atribuible_al_incendio"
+          ],
+          "clear": [
+            "afectacion_por_incendio_en_individuos_vivos",
+            "respuesta_post_incendio_en_vivos",
+            "altura_del_rebrote",
+            "dano_adicional_no_atribuible_al_incendio"
+          ]
+        }
+      ]
+    },
+    "csv": {
+      "filename_prefix": "parcelas_veg",
+      "columns": [
+        {
+          "key": "header.date",
+          "label": "Fecha"
+        },
+        {
+          "key": "header.observer",
+          "label": "Observador"
+        },
+        {
+          "key": "header.utm_e",
+          "label": "UTM_E"
+        },
+        {
+          "key": "header.utm_n",
+          "label": "UTM_N"
+        },
+        {
+          "key": "header.rodal",
+          "label": "Rodal"
+        },
+        {
+          "key": "header.plot_code",
+          "label": "Parcela"
+        },
+        {
+          "key": "ind.species_label",
+          "label": "Ejemplar"
+        },
+        {
+          "key": "ind.sobrevivencia",
+          "label": "1.-Sobrevivencia"
+        },
+        {
+          "key": "ind.afectacion_por_incendio_en_individuos_vivos",
+          "label": "2.- Afectación por incendio (en individuos vivos)"
+        },
+        {
+          "key": "ind.respuesta_post_incendio_en_vivos",
+          "label": "3.- Respuesta post-incendio (en vivos)"
+        },
+        {
+          "key": "ind.altura_del_rebrote",
+          "label": "4.- Altura del rebrote"
+        },
+        {
+          "key": "ind.dano_adicional_no_atribuible_al_incendio",
+          "label": "5.- Daño adicional no atribuible al incendio"
+        },
+        {
+          "key": "ind.estado_del_tutor_coligue",
+          "label": "6.- Estado del tutor - coligue"
+        },
+        {
+          "key": "ind.estado_del_protector",
+          "label": "7.- Estado del protector"
+        },
+        {
+          "key": "ind.estado_de_la_taza_de_recepcion_de_aguas",
+          "label": "8.- Estado de la taza de recepción de aguas"
+        },
+        {
+          "key": "ind.estado_del_bordo_semicircular",
+          "label": "9.- Estado del bordo semicircular"
+        }
+      ]
+    }
+  }
 }

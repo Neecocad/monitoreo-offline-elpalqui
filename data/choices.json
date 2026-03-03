@@ -1,9 +1,164 @@
 {
-"parcelas": {
-"species": [
-{ "code": "quillay", "label": "Quillay" },
-{ "code": "espino", "label": "Espino" },
-{ "code": "litre", "label": "Litre" }
-]
-}
+  "parcelas": {
+    "species": [
+      {
+        "code": "colliguay",
+        "label": "Colliguay"
+      },
+      {
+        "code": "espino",
+        "label": "Espino"
+      },
+      {
+        "code": "huingan",
+        "label": "Huingán"
+      },
+      {
+        "code": "litre",
+        "label": "Litre"
+      },
+      {
+        "code": "molle",
+        "label": "Molle"
+      },
+      {
+        "code": "peumo",
+        "label": "Peumo"
+      },
+      {
+        "code": "quillay",
+        "label": "Quillay"
+      },
+      {
+        "code": "quebracho",
+        "label": "Quebracho"
+      },
+      {
+        "code": "maqui",
+        "label": "Maqui"
+      },
+      {
+        "code": "maiten",
+        "label": "Maitén"
+      }
+    ],
+    "sobrevivencia": [
+      {
+        "code": "0",
+        "label": "Muerto"
+      },
+      {
+        "code": "1",
+        "label": "Vivo"
+      }
+    ],
+    "afectacion_por_incendio_en_individuos_vivos": [
+      {
+        "code": "0",
+        "label": "No afectado"
+      },
+      {
+        "code": "1",
+        "label": "Afectación leve de la copa (1 - 25%)"
+      },
+      {
+        "code": "2",
+        "label": "Afectación moderada de la copa (25 - 75%)"
+      },
+      {
+        "code": "3",
+        "label": "Afectación severa (76 - 100%)"
+      }
+    ],
+    "respuesta_post_incendio_en_vivos": [
+      {
+        "code": "0",
+        "label": "Vivo afectado sin rebrote visible"
+      },
+      {
+        "code": "1",
+        "label": "Vivo afectado con rebrote"
+      }
+    ],
+    "altura_del_rebrote": [
+      {
+        "code": "1",
+        "label": "Rebrote bajo (Altura <10 cm)"
+      },
+      {
+        "code": "2",
+        "label": "Rebrote medio (Altura 10 - 30 cm)"
+      },
+      {
+        "code": "3",
+        "label": "Rebrote alto (Altura >30 cm)"
+      }
+    ],
+    "dano_adicional_no_atribuible_al_incendio": [
+      {
+        "code": "0",
+        "label": "Sin daño adicional observable"
+      },
+      {
+        "code": "1",
+        "label": "Con daño adicional observable"
+      }
+    ],
+    "estado_del_tutor_coligue": [
+      {
+        "code": "0",
+        "label": "Sin tutor"
+      },
+      {
+        "code": "1",
+        "label": "Mal estado"
+      },
+      {
+        "code": "2",
+        "label": "En buen estado"
+      }
+    ],
+    "estado_del_protector": [
+      {
+        "code": "0",
+        "label": "Sin protector"
+      },
+      {
+        "code": "1",
+        "label": "Mal estado"
+      },
+      {
+        "code": "2",
+        "label": "En buen estado"
+      }
+    ],
+    "estado_de_la_taza_de_recepcion_de_aguas": [
+      {
+        "code": "0",
+        "label": "Sin taza"
+      },
+      {
+        "code": "1",
+        "label": "En mal estado"
+      },
+      {
+        "code": "2",
+        "label": "En buen estado"
+      }
+    ],
+    "estado_del_bordo_semicircular": [
+      {
+        "code": "0",
+        "label": "Ausente"
+      },
+      {
+        "code": "1",
+        "label": "Presente en mal estado"
+      },
+      {
+        "code": "2",
+        "label": "Presente en buen estado"
+      }
+    ]
+  }
 }
