@@ -10,7 +10,9 @@
   { "code": "quillay", "label": "Quillay" },
   { "code": "quebracho", "label": "Quebracho" },
   { "code": "maqui", "label": "Maqui" },
-  { "code": "maiten", "label": "Maitén" }
+  { "code": "maiten", "label": "Maitén" },
+  { "code": "nn_vivas", "label": "NN vivas" },
+  { "code": "nn_muertas", "label": "NN muertas" }
 ],
    
     "sobrevivencia": [
