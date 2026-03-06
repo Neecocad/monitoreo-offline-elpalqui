@@ -5,205 +5,291 @@ import { loadChoices } from "./catalogs.js";
 import { exportParcelasCSV } from "./export.js";
 
 let schema;
-const headerState={};
-let individuals=[];
+const headerState = {};
+let individuals = [];
 let editingRecordId = null;
 
-function setNetBadge(){
-  const el=document.getElementById("netBadge");
-  if(navigator.onLine){ el.textContent="ONLINE"; el.className="badge ok"; }
-  else { el.textContent="OFFLINE"; el.className="badge off"; }
-}
+function setNetBadge() {
+  const el = document.getElementById("netBadge");
+  if (!el) return;
 
-async function loadVersion(){
-  try{ const res=await fetch("version.json",{cache:"no-store"}); const v=await res.json();
-    document.getElementById("verBadge").textContent=`v${v.version}`;
-  }catch{ document.getElementById("verBadge").textContent="v?"; }
-}
-
-async function getDeviceId(){
-  const r=await metaGet("device_id");
-  if(r?.value) return r.value;
-  const id=uuid(); await metaSet("device_id",id); return id;
-}
-
-async function refreshSaved(){
-  const last=await getAllLast(schema.store,10);
-  const el=document.getElementById("savedList");
-  if(!last.length){ el.textContent="Sin registros aún."; return; }
-el.innerHTML = last.map(r => {
-  const pc = r.header?.plot_code ?? "";
-  const rod = r.header?.rodal ?? "";
-  const dt = r.header?.date ?? "";
-  const n = r.data?.individuals?.length ?? 0;
-
-  return `
-    <div style="margin-bottom:10px; padding:10px; border:1px solid rgba(255,255,255,.12); border-radius:10px;">
-      <div>• ${dt} · Rodal ${rod} · Parcela ${pc} · ${n} individuos</div>
-      <div style="margin-top:8px;">
-        <button type="button" data-edit-id="${r.id}" class="btn-edit-record">
-          Editar
-        </button>
-      </div>
-    </div>
-  `;
-}).join("");
-}
-
-async function renderAll(){
-  await renderHeader(schema,document.getElementById("headerFields"),headerState);
-  const list=document.getElementById("indList"); list.innerHTML="";
-  for(let i=0;i<individuals.length;i++){
-    const ind=individuals[i];
-    const card=await renderIndividual(schema.individuals,ind,()=>{
-      individuals.splice(i,1);
-      individuals.forEach((x,idx)=>x.individual_seq=idx+1);
-      renderAll();
-    });
-    list.appendChild(card);
+  if (navigator.onLine) {
+    el.textContent = "ONLINE";
+    el.className = "badge ok";
+  } else {
+    el.textContent = "OFFLINE";
+    el.className = "badge off";
   }
-  document.getElementById("indCount").textContent=`Individuos: ${individuals.length}`;
+}
+
+async function loadVersion() {
+  try {
+    const res = await fetch("version.json", { cache: "no-store" });
+    const v = await res.json();
+    const el = document.getElementById("verBadge");
+    if (el) el.textContent = `v${v.version}`;
+  } catch {
+    const el = document.getElementById("verBadge");
+    if (el) el.textContent = "v?";
+  }
+}
+
+async function getDeviceId() {
+  const r = await metaGet("device_id");
+  if (r?.value) return r.value;
+
+  const id = uuid();
+  await metaSet("device_id", id);
+  return id;
+}
+
+async function refreshSaved() {
+  const last = await getAllLast(schema.store, 10);
+  const el = document.getElementById("savedList");
+  if (!el) return;
+
+  if (!last.length) {
+    el.textContent = "Sin registros aún.";
+    return;
+  }
+
+  el.innerHTML = last.map((r) => {
+    const pc = r.header?.plot_code ?? "";
+    const rod = r.header?.rodal ?? "";
+    const dt = r.header?.date ?? "";
+    const n = r.data?.individuals?.length ?? 0;
+
+    return `
+      <div style="margin-bottom:10px; padding:10px; border:1px solid rgba(255,255,255,.12); border-radius:10px;">
+        <div>• ${dt} · Rodal ${rod} · Parcela ${pc} · ${n} individuos</div>
+        <div style="margin-top:8px; display:flex; gap:8px; flex-wrap:wrap;">
+          <button type="button" data-edit-id="${r.id}" class="btn-edit-record">
+            Editar
+          </button>
+        </div>
+      </div>
+    `;
+  }).join("");
+}
+
+async function renderAll() {
+  const headerEl = document.getElementById("headerFields");
+  if (headerEl) {
+    await renderHeader(schema, headerEl, headerState);
+  }
+
+  const list = document.getElementById("indList");
+  if (list) {
+    list.innerHTML = "";
+
+    for (let i = 0; i < individuals.length; i++) {
+      const ind = individuals[i];
+
+      const card = await renderIndividual(schema.individuals, ind, () => {
+        individuals.splice(i, 1);
+        individuals.forEach((x, idx) => {
+          x.individual_seq = idx + 1;
+        });
+        renderAll();
+      });
+
+      list.appendChild(card);
+    }
+  }
+
+  const countEl = document.getElementById("indCount");
+  if (countEl) {
+    countEl.textContent = `Individuos: ${individuals.length}`;
+  }
+
   await refreshSaved();
 }
 
-function newParcel(){
+function newParcel() {
   editingRecordId = null;
-  headerState.date=todayISO();
-  headerState.project="Eletrans Palqui";
-  headerState.rodal="";          // <-- RODAL visible
-  headerState.plot_code="";
-  headerState.observer="";
-  headerState.utm_e="";
-  headerState.utm_n="";
-  headerState.utm_zone="19S";
-  headerState.datum="WGS84";
-  individuals=[];
+
+  headerState.date = todayISO();
+  headerState.project = "Eletrans Palqui";
+  headerState.rodal = "";
+  headerState.plot_code = "";
+  headerState.observer = "";
+  headerState.utm_e = "";
+  headerState.utm_n = "";
+  headerState.utm_zone = "19S";
+  headerState.datum = "WGS84";
+
+  individuals = [];
   renderAll();
 }
 
-function addIndividual(){
+function addIndividual() {
   individuals.push({
-    individual_seq: individuals.length+1,
-    species:"",
-    sobrevivencia:"",
-    afectacion_por_incendio_en_individuos_vivos:"",
-    respuesta_post_incendio_en_vivos:"",
-    altura_del_rebrote:"",
-    dano_adicional_no_atribuible_al_incendio:"",
-    estado_del_tutor_coligue:"",
-    estado_del_protector:"",
-    estado_de_la_taza_de_recepcion_de_aguas:"",
-    estado_del_bordo_semicircular:""
+    individual_seq: individuals.length + 1,
+    species: "",
+    sobrevivencia: "",
+    afectacion_por_incendio_en_individuos_vivos: "",
+    respuesta_post_incendio_en_vivos: "",
+    altura_del_rebrote: "",
+    dano_adicional_no_atribuible_al_incendio: "",
+    estado_del_tutor_coligue: "",
+    estado_del_protector: "",
+    estado_de_la_taza_de_recepcion_de_aguas: "",
+    estado_del_bordo_semicircular: ""
   });
+
   renderAll();
 }
 
-async function saveParcel(){
-  const errs=validateParcel(schema,headerState,individuals);
-  if(errs.length){ showToast(errs[0]); console.warn(errs); return; }
-  const device_id=await getDeviceId();
-  const rec={
+async function saveParcel() {
+  const errs = validateParcel(schema, headerState, individuals);
+  if (errs.length) {
+    showToast(errs[0]);
+    console.warn(errs);
+    return;
+  }
+
+  const device_id = await getDeviceId();
+
+  const rec = {
     id: editingRecordId || uuid(),
     form_type: "parcelas_veg",
     form_version: "v1",
     created_at: isoNow(),
     updated_at: isoNow(),
     device_id,
-    header: {...headerState, utm_zone:"19S", datum:"WGS84"},
-    data: { plot:{area_m2:500}, individuals: individuals.map(x=>({...x}))}
+    header: {
+      ...headerState,
+      utm_zone: "19S",
+      datum: "WGS84"
+    },
+    data: {
+      plot: { area_m2: 500 },
+      individuals: individuals.map((x) => ({ ...x }))
+    }
   };
-  await put(schema.store,rec);
+
+  await put(schema.store, rec);
+
   showToast(editingRecordId ? "Parcela actualizada." : "Parcela guardada.");
+
   editingRecordId = null;
   await refreshSaved();
 }
 
-async function setupSW(){
-  const badge=document.getElementById("swBadge");
-  const btn=document.getElementById("btnUpdate");
-  if(!("serviceWorker" in navigator)){ badge.textContent="SW: no"; return; }
-  try{
-    const reg=await navigator.serviceWorker.register("./sw.js");
-    badge.textContent="SW: ok";
-    reg.addEventListener("updatefound",()=>{
-      const nw=reg.installing;
-      nw?.addEventListener("statechange",()=>{
-        if(nw.state==="installed" && navigator.serviceWorker.controller){
-          btn.style.display="inline-block";
-          badge.textContent="SW: update";
+async function setupSW() {
+  const badge = document.getElementById("swBadge");
+  const btn = document.getElementById("btnUpdate");
+
+  if (!("serviceWorker" in navigator)) {
+    if (badge) badge.textContent = "SW: no";
+    return;
+  }
+
+  try {
+    const reg = await navigator.serviceWorker.register("./sw.js");
+    if (badge) badge.textContent = "SW: ok";
+
+    reg.addEventListener("updatefound", () => {
+      const nw = reg.installing;
+      nw?.addEventListener("statechange", () => {
+        if (nw.state === "installed" && navigator.serviceWorker.controller) {
+          if (btn) btn.style.display = "inline-block";
+          if (badge) badge.textContent = "SW: update";
         }
       });
     });
-    btn.addEventListener("click",()=>{
-      if(reg.waiting) reg.waiting.postMessage({type:"SKIP_WAITING"});
-      let reloaded=false;
-      navigator.serviceWorker.addEventListener("controllerchange",()=>{
-        if(reloaded) return;
-        reloaded=true
-        window.location.reload();
+
+    if (btn) {
+      btn.addEventListener("click", () => {
+        if (reg.waiting) reg.waiting.postMessage({ type: "SKIP_WAITING" });
+
+        let reloaded = false;
+        navigator.serviceWorker.addEventListener("controllerchange", () => {
+          if (reloaded) return;
+          reloaded = true;
+          window.location.reload();
+        });
       });
-    });
-    reg.update().catch(()=>{});
-  }catch(e){ console.error(e); badge.textContent="SW: err"; }
+    }
+
+    reg.update().catch(() => {});
+  } catch (e) {
+    console.error(e);
+    if (badge) badge.textContent = "SW: err";
+  }
 }
 
-async function main(){
-  setNetBadge(); window.addEventListener("online",setNetBadge); window.addEventListener("offline",setNetBadge);
+async function main() {
+  setNetBadge();
+  window.addEventListener("online", setNetBadge);
+  window.addEventListener("offline", setNetBadge);
+
   await loadVersion();
   await loadChoices();
-  const schemas=await loadSchemas();
-  schema=schemas["parcelas_veg"];
+
+  const schemas = await loadSchemas();
+  schema = schemas["parcelas_veg"];
 
   const btnTop = document.getElementById("btnAddInd");
   if (btnTop) btnTop.onclick = addIndividual;
 
   const btnBottom = document.getElementById("btnAddIndBottom");
   if (btnBottom) btnBottom.onclick = addIndividual;
-  document.getElementById("btnSaveParcel").onclick=saveParcel;
-  document.getElementById("btnNewParcel").onclick=()=>{ newParcel(); showToast("Nueva parcela."); };
-  document.getElementById("btnExportParcelas").onclick=()=>exportParcelasCSV(schema);
-  
-document.addEventListener("click", async (e) => {
-  const t = e.target;
-  if (!t) return;
 
-  if (t.id === "btnClearAll") {
-    e.preventDefault();
+  const btnSave = document.getElementById("btnSaveParcel");
+  if (btnSave) btnSave.onclick = saveParcel;
 
-    const ok = confirm("¿Estás seguro que quieres borrar TODOS los registros guardados?");
-    if (!ok) return;
-
-    await clearAll(schema.store);
-
-    alert("Registros eliminados correctamente.");
-    location.reload();
+  const btnNew = document.getElementById("btnNewParcel");
+  if (btnNew) {
+    btnNew.onclick = () => {
+      newParcel();
+      showToast("Nueva parcela.");
+    };
   }
 
-  // 👇 PEGA ESTE BLOQUE JUSTO AQUÍ
-  if (t.dataset && t.dataset.editId) {
-    const id = t.dataset.editId;
+  const btnExport = document.getElementById("btnExportParcelas");
+  if (btnExport) {
+    btnExport.onclick = () => exportParcelasCSV(schema);
+  }
 
-    const rec = await getById(schema.store, id);
-    if (!rec) {
-      alert("No se encontró el registro.");
+  document.addEventListener("click", async (e) => {
+    const t = e.target;
+    if (!t) return;
+
+    if (t.id === "btnClearAll") {
+      e.preventDefault();
+
+      const ok = confirm("¿Estás seguro que quieres borrar TODOS los registros guardados?");
+      if (!ok) return;
+
+      await clearAll(schema.store);
+
+      alert("Registros eliminados correctamente.");
+      location.reload();
       return;
     }
 
-    editingRecordId = rec.id;
+    if (t.dataset && t.dataset.editId) {
+      const id = t.dataset.editId;
 
-    // cargar encabezado
-    Object.keys(headerState).forEach(k => delete headerState[k]);
-    Object.assign(headerState, rec.header || {});
+      const rec = await getById(schema.store, id);
+      if (!rec) {
+        alert("No se encontró el registro.");
+        return;
+      }
 
-    // cargar individuos
-    individuals = (rec.data?.individuals || []).map(ind => ({ ...ind }));
+      editingRecordId = rec.id;
 
-    await renderAll();
+      Object.keys(headerState).forEach((k) => delete headerState[k]);
+      Object.assign(headerState, rec.header || {});
 
-    showToast("Registro cargado para edición.");
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  }
-});
+      individuals = (rec.data?.individuals || []).map((ind) => ({ ...ind }));
+
+      await renderAll();
+
+      showToast("Registro cargado para edición.");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
   });
 
   newParcel();
