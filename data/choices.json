@@ -55,6 +55,10 @@
     ],
     "altura_del_rebrote": [
       {
+        "code": "0",
+        "label": "Sin rebrote"
+      },
+      {
         "code": "1",
         "label": "Rebrote bajo (Altura <10 cm)"
       },
@@ -74,7 +78,11 @@
       },
       {
         "code": "1",
-        "label": "Con daño adicional observable"
+        "label": "Con daño visible por herbívoros"
+      }
+      {
+        "code": "2",
+        "label": "Con daño visible - fitosanitario"
       }
     ],
     "estado_del_tutor_coligue": [
