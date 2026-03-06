@@ -73,3 +73,7 @@ export async function metaSet(key, value) {
 export async function clearAll(storeName){
   return withStore(storeName, "readwrite", (s) => reqToPromise(s.clear()));
 }
+
+export async function getById(storeName, id) {
+  return withStore(storeName, "readonly", (s) => reqToPromise(s.get(id)));
+}
