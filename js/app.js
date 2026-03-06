@@ -1,5 +1,5 @@
 import { uuid, isoNow, todayISO, showToast } from "./utils.js";
-import { put, getAllLast, clearAll, metaGet, metaSet } from "./db.js";
+import { put, getAllLast, getById, clearAll, metaGet, metaSet } from "./db.js";
 import { loadSchemas, renderHeader, renderIndividual, validateParcel } from "./schema_engine.js";
 import { loadChoices } from "./catalogs.js";
 import { exportParcelasCSV } from "./export.js";
@@ -7,6 +7,7 @@ import { exportParcelasCSV } from "./export.js";
 let schema;
 const headerState={};
 let individuals=[];
+let editingRecordId = null;
 
 function setNetBadge(){
   const el=document.getElementById("netBadge");
@@ -30,11 +31,23 @@ async function refreshSaved(){
   const last=await getAllLast(schema.store,10);
   const el=document.getElementById("savedList");
   if(!last.length){ el.textContent="Sin registros aún."; return; }
-  el.innerHTML=last.map(r=>{
-    const pc=r.header?.plot_code??""; const rod=r.header?.rodal??""; const dt=r.header?.date??"";
-    const n=r.data?.individuals?.length??0;
-    return `• ${dt} · Rodal ${rod} · Parcela ${pc} · ${n} individuos`;
-  }).join("<br>");
+el.innerHTML = last.map(r => {
+  const pc = r.header?.plot_code ?? "";
+  const rod = r.header?.rodal ?? "";
+  const dt = r.header?.date ?? "";
+  const n = r.data?.individuals?.length ?? 0;
+
+  return `
+    <div style="margin-bottom:10px; padding:10px; border:1px solid rgba(255,255,255,.12); border-radius:10px;">
+      <div>• ${dt} · Rodal ${rod} · Parcela ${pc} · ${n} individuos</div>
+      <div style="margin-top:8px;">
+        <button type="button" data-edit-id="${r.id}" class="btn-edit-record">
+          Editar
+        </button>
+      </div>
+    </div>
+  `;
+}).join("");
 }
 
 async function renderAll(){
@@ -54,6 +67,7 @@ async function renderAll(){
 }
 
 function newParcel(){
+  editingRecordId = null;
   headerState.date=todayISO();
   headerState.project="Eletrans Palqui";
   headerState.rodal="";          // <-- RODAL visible
@@ -89,7 +103,7 @@ async function saveParcel(){
   if(errs.length){ showToast(errs[0]); console.warn(errs); return; }
   const device_id=await getDeviceId();
   const rec={
-    id: uuid(),
+    id: editingRecordId || uuid(),
     form_type: "parcelas_veg",
     form_version: "v1",
     created_at: isoNow(),
@@ -99,7 +113,8 @@ async function saveParcel(){
     data: { plot:{area_m2:500}, individuals: individuals.map(x=>({...x}))}
   };
   await put(schema.store,rec);
-  showToast("Parcela guardada.");
+  showToast(editingRecordId ? "Parcela actualizada." : "Parcela guardada.");
+  editingRecordId = null;
   await refreshSaved();
 }
 
@@ -148,21 +163,47 @@ async function main(){
   document.getElementById("btnNewParcel").onclick=()=>{ newParcel(); showToast("Nueva parcela."); };
   document.getElementById("btnExportParcelas").onclick=()=>exportParcelasCSV(schema);
   
-  document.addEventListener("click", async (e) => {
-    const t = e.target;
-    if (!t) return;
+document.addEventListener("click", async (e) => {
+  const t = e.target;
+  if (!t) return;
 
-    if (t.id === "btnClearAll") {
-      e.preventDefault();
+  if (t.id === "btnClearAll") {
+    e.preventDefault();
 
-      const ok = confirm("¿Estás seguro que quieres borrar TODOS los registros guardados?");
-      if (!ok) return;
+    const ok = confirm("¿Estás seguro que quieres borrar TODOS los registros guardados?");
+    if (!ok) return;
 
-      await clearAll(schema.store);
+    await clearAll(schema.store);
 
-      alert("Registros eliminados correctamente.");
-      location.reload();
+    alert("Registros eliminados correctamente.");
+    location.reload();
+  }
+
+  // 👇 PEGA ESTE BLOQUE JUSTO AQUÍ
+  if (t.dataset && t.dataset.editId) {
+    const id = t.dataset.editId;
+
+    const rec = await getById(schema.store, id);
+    if (!rec) {
+      alert("No se encontró el registro.");
+      return;
     }
+
+    editingRecordId = rec.id;
+
+    // cargar encabezado
+    Object.keys(headerState).forEach(k => delete headerState[k]);
+    Object.assign(headerState, rec.header || {});
+
+    // cargar individuos
+    individuals = (rec.data?.individuals || []).map(ind => ({ ...ind }));
+
+    await renderAll();
+
+    showToast("Registro cargado para edición.");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+});
   });
 
   newParcel();
